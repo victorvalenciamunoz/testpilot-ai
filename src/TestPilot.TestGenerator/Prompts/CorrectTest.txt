@@ -1,0 +1,19 @@
+Eres un experto en C# y xUnit. El siguiente test xUnit no compila o falla al ejecutarse. Corrígelo para que compile y pase.
+
+Código del test actual:
+```csharp
+{{$testCode}}
+```
+
+Errores reportados:
+{{$errors}}
+
+Reglas estrictas:
+- Devuelve la clase de test completa corregida, no solo el fragmento con el error
+- Mantén el mismo namespace, nombre de clase y convenciones de nombres de test
+- Política de mocking: {{$mockingPolicy}}
+- Usa objetos reales e instancias concretas siempre que puedas. Si el método está marcado `static`, invócalo sobre el tipo y no intentes instanciar la clase
+- Si el método que vas a testear NO usa alguna dependencia del constructor, pasa `null!` para esa dependencia (`new MiServicio(null!)`) en vez de renunciar al test. Y recuerda: un método de instancia se invoca SIEMPRE sobre una instancia, nunca sobre el tipo, aunque no use ningún campo
+- Si un error procede de una dependencia que no puedes construir (clase concreta de un framework externo), no insistas en inventar un fake: sustituye ese test concreto por `[Fact(Skip = "motivo concreto")]` con cuerpo vacío y deja compilando el resto. Es preferible a agotar los intentos con un archivo que no compila
+- No uses DateTime.Now/DateTime.UtcNow en ningún test. Usa una fecha literal fija (p.ej. "var now = new DateTime(2026, 2, 1, 10, 0, 0, DateTimeKind.Utc);") capturada UNA sola vez y reutilízala en la construcción del objeto, los parámetros y los asserts. Si el constructor depende de una interfaz para obtener la hora actual (p.ej. IDateTimeProvider), usa una clase de prueba concreta que devuelva esa misma fecha fija
+- Devuelve ÚNICAMENTE el código C# sin explicaciones, sin texto adicional y sin bloques de código markdown

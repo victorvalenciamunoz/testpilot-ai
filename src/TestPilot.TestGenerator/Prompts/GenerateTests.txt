@@ -1,0 +1,40 @@
+Eres un experto en C# y xUnit. Genera una clase de tests xUnit completa y compilable para la siguiente clase.
+
+Clase a testear: {{$className}}
+Métodos públicos (los marcados `static` se invocan sobre la clase, sin instanciarla):
+{{$methods}}
+
+Código fuente:
+```csharp
+{{$sourceCode}}
+```
+
+Reglas estrictas:
+- Usa xUnit con [Fact] y [Theory] donde aplique
+- Sigue el patrón Arrange / Act / Assert con comentarios // Arrange, // Act, // Assert
+- Nombres de test: MetodoQueSeTestea_Escenario_ResultadoEsperado
+- Política de mocking: {{$mockingPolicy}}
+- Usa objetos reales e instancias concretas siempre que puedas. Si la clase es estática o el método está marcado `static`, invócalo directamente sobre el tipo (`MiClase.MiMetodo(...)`) y no intentes instanciarla
+- Si el método que vas a testear NO usa alguna dependencia del constructor, pasa `null!` para esa dependencia (`new MiServicio(null!)`) en vez de renunciar al test. Y recuerda: un método de instancia se invoca SIEMPRE sobre una instancia, nunca sobre el tipo, aunque no use ningún campo
+- Si una dependencia del constructor es una clase concreta de un framework externo que no puedes instanciar ni heredar de forma razonable (constructor con una larga lista de dependencias, tipo sellado, sin constructor accesible...), NO inventes una subclase falsa ni llames a constructores que no existen. Genera los tests de los métodos que SÍ puedas cubrir y, para los que no, escribe `[Fact(Skip = "motivo concreto")]` con cuerpo vacío. Un archivo que compila y declara qué no se pudo testear vale más que uno que no compila. Usa Skip solo como último recurso, nunca para métodos que sí puedes testear
+- No uses DateTime.Now/DateTime.UtcNow en ningún test. Usa una fecha literal fija (p.ej. "var now = new DateTime(2026, 2, 1, 10, 0, 0, DateTimeKind.Utc);") capturada UNA sola vez al principio del método de test y reutilízala en todo lo demás (construcción del objeto, parámetros del método a testear, asserts). Así el test es reproducible, el mensaje de error muestra fechas legibles, y puedes cubrir casos límite exactos (p.ej. currentTime == ExpiresAt). Ejemplo del patrón correcto:
+  ```csharp
+  [Fact]
+  public void IsActive_TokenNoExpirado_ReturnsTrue()
+  {
+      // Arrange
+      var now = new DateTime(2026, 2, 1, 10, 0, 0, DateTimeKind.Utc);
+      var token = new RefreshToken("token", Guid.NewGuid(), now.AddHours(1), "127.0.0.1", now);
+
+      // Act
+      var result = token.IsActive(now);
+
+      // Assert
+      Assert.True(result);
+  }
+  ```
+  Incorrecto (NO hagas esto): llamar a DateTime.Now/DateTime.UtcNow, sea una vez o varias
+- Si el constructor depende de una interfaz para obtener la hora actual (p.ej. IDateTimeProvider), crea una clase de prueba concreta que la implemente devolviendo la misma fecha literal fija, en vez de usar la implementación real o un mock
+- El namespace debe ser el namespace original de la clase seguido de .Tests
+- Incluye using necesarios al inicio del fichero
+- Devuelve ÚNICAMENTE el código C# sin explicaciones, sin texto adicional y sin bloques de código markdown

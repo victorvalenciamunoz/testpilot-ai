@@ -1,0 +1,15 @@
+<Solution>
+  <Project Path="../tests/TestPilot.SourceAnalyzer.Tests/TestPilot.SourceAnalyzer.Tests.csproj" />
+  <Project Path="../tests/TestPilot.TestGenerator.Tests/TestPilot.TestGenerator.Tests.csproj" />
+  <Project Path="../tests/TestPilot.TestRunner.Tests/TestPilot.TestRunner.Tests.csproj" />
+  <Project Path="../tests/TestPilot.CodeReviewer.Tests/TestPilot.CodeReviewer.Tests.csproj" />
+  <Project Path="../tests/TestPilot.McpServer.Tests/TestPilot.McpServer.Tests.csproj" />
+  <Project Path="TestPilot.API/TestPilot.API.csproj" />
+  <Project Path="TestPilot.CodeReviewer/TestPilot.CodeReviewer.csproj" />
+  <Project Path="TestPilot.Core/TestPilot.Core.csproj" />
+  <Project Path="TestPilot.McpServer/TestPilot.McpServer.csproj" />
+  <Project Path="TestPilot.ReportGenerator/TestPilot.ReportGenerator.csproj" />
+  <Project Path="TestPilot.SourceAnalyzer/TestPilot.SourceAnalyzer.csproj" />
+  <Project Path="TestPilot.TestGenerator/TestPilot.TestGenerator.csproj" />
+  <Project Path="TestPilot.TestRunner/TestPilot.TestRunner.csproj" />
+</Solution>

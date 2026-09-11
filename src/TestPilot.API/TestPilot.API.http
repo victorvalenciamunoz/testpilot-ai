@@ -1,0 +1,131 @@
+@TestPilot.API_HostAddress = http://localhost:5105
+
+### Analizar una solución: devuelve las clases públicas y qué métodos no tienen tests
+POST {{TestPilot.API_HostAddress}}/api/analyze
+Content-Type: application/json
+
+{
+  "solutionPath": "C:\\ruta\\a\\MiSolucion.sln"
+}
+
+### Generar tests para todas las clases sin tests
+POST {{TestPilot.API_HostAddress}}/api/generate
+Content-Type: application/json
+
+{
+  "solutionPath": "C:\\ruta\\a\\MiSolucion.sln",
+  "outputPath": "C:\\ruta\\a\\salida-tests"
+}
+
+### Generar tests solo para clases concretas (FullName tal cual lo devuelve /api/analyze)
+POST {{TestPilot.API_HostAddress}}/api/generate
+Content-Type: application/json
+
+{
+  "solutionPath": "C:\\ruta\\a\\MiSolucion.sln",
+  "outputPath": "C:\\ruta\\a\\salida-tests",
+  "classNames": ["MyApp.Services.OrderService", "MyApp.Services.PaymentService"]
+}
+
+### Generar tests con bucle corrector: ejecuta cada test y lo corrige hasta 3 veces si falla
+POST {{TestPilot.API_HostAddress}}/api/generate
+Content-Type: application/json
+
+{
+  "solutionPath": "C:\\ruta\\a\\MiSolucion.sln",
+  "outputPath": "C:\\ruta\\a\\proyecto-de-tests",
+  "testProjectPath": "C:\\ruta\\a\\proyecto-de-tests",
+  "classNames": ["MyApp.Services.OrderService"]
+}
+
+### Analizar incluyendo clases internal (útil en arquitecturas CQRS con handlers internal)
+POST {{TestPilot.API_HostAddress}}/api/analyze
+Content-Type: application/json
+
+{
+  "solutionPath": "C:\\ruta\\a\\MiSolucion.sln",
+  "includeInternal": true
+}
+
+### Revisar el diff pendiente (sin commitear) de un repositorio git
+POST {{TestPilot.API_HostAddress}}/api/review
+Content-Type: application/json
+
+{
+  "repoPath": "C:\\ruta\\a\\mi-repo"
+}
+
+### Revisar el diff entre una rama base y HEAD
+POST {{TestPilot.API_HostAddress}}/api/review
+Content-Type: application/json
+
+{
+  "repoPath": "C:\\ruta\\a\\mi-repo",
+  "baseBranch": "main"
+}
+
+### Revisar un diff pasado directamente (sin acceso a un repo git)
+POST {{TestPilot.API_HostAddress}}/api/review/diff
+Content-Type: application/json
+
+{
+  "diff": "--- a/Foo.cs\n+++ b/Foo.cs\n@@ -1,3 +1,3 @@\n-return null;\n+return string.Empty;\n"
+}
+
+###
+
+### Revisar un diff aplicando las convenciones de criterio del proyecto
+### (el estilo y la nomenclatura los cubre .editorconfig; las dependencias entre capas, NetArchTest)
+POST {{TestPilot.API_HostAddress}}/api/review/diff
+Content-Type: application/json
+
+{
+  "diff": "--- a/InvoiceService.cs\n+++ b/InvoiceService.cs\n@@ -1,3 +1,8 @@\n+    public decimal ApplyDiscount(Invoice invoice, decimal percent)\n+    {\n+        if (percent > 100) throw new InvalidOperationException(\"fuera de rango\");\n+        return invoice.Lines.Sum(l => l.Quantity * l.UnitPrice);\n+    }\n",
+  "conventions": "- Los servicios no contienen lógica de negocio: delegan en el dominio\n- No usamos excepciones para control de flujo; devolvemos Result<T>\n- Nada de abstracciones por si acaso: una interfaz con una sola implementación sobra"
+}
+
+### Revisar indicando dónde están las convenciones, en vez de pegarlas
+### (en MCP es la opción preferible: el fichero no ocupa el contexto del agente)
+POST {{TestPilot.API_HostAddress}}/api/review/diff
+Content-Type: application/json
+
+{
+  "diff": "--- a/Foo.cs\n+++ b/Foo.cs\n@@ -1,3 +1,3 @@\n-return null;\n+return string.Empty;\n",
+  "conventionsPath": "C:\ruta\a\mi-repo\CONTRIBUTING.md"
+}
+
+### Revisar el diff de un repo aplicando sus convenciones
+POST {{TestPilot.API_HostAddress}}/api/review
+Content-Type: application/json
+
+{
+  "repoPath": "C:\ruta\a\mi-repo",
+  "baseBranch": "main",
+  "conventionsPath": "C:\ruta\a\mi-repo\CONTRIBUTING.md"
+}
+
+###
+
+### Analizar con cobertura REAL (coverlet) en vez de la heurística de nombres
+### Ejecuta los tests del proyecto indicado; más lento, pero el dato es por método y sin falsos positivos
+### REQUISITO: el proyecto de tests debe tener el paquete coverlet.collector. Si no, devuelve 400 explicándolo
+POST {{TestPilot.API_HostAddress}}/api/analyze
+Content-Type: application/json
+
+{
+  "solutionPath": "C:\ruta\a\MiSolucion.sln",
+  "testProjectPath": "C:\ruta\a\tests\MiProyecto.Tests"
+}
+
+### Generar tests decidiendo los huecos por cobertura real
+POST {{TestPilot.API_HostAddress}}/api/generate
+Content-Type: application/json
+
+{
+  "solutionPath": "C:\ruta\a\MiSolucion.sln",
+  "outputPath": "C:\ruta\a\tests\MiProyecto.Tests",
+  "testProjectPath": "C:\ruta\a\tests\MiProyecto.Tests",
+  "useCoverage": true
+}
+
+###
